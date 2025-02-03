@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { Navbar } from "@/components/navbar";
+import Navbar  from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Code2, Users } from "lucide-react";
 import Link from "next/link";
