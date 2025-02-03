@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (event === "SIGNED_IN") {
           router.push("/"); // Redirect to homepage
         } else if (event === "SIGNED_OUT") {
-          router.push("/signin"); // Redirect to sign-in
+          router.push("/"); // Redirect to sign-in
         }
       }
     );

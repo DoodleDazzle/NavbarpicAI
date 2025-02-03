@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Brain } from "lucide-react";
 import { ModeToggle } from "@/components/mode-toggle";
 import Image from "next/image";
-import { useAuth } from "@/lib/AuthProvider";
+import { useAuth } from "@/lib/authProvider";
 
 export default function Navbar() {
   const { user, signOut } = useAuth();
@@ -14,7 +14,7 @@ export default function Navbar() {
   console.log("User object:", user);
 
   // Helper function to extract initials
-  const getInitials = (name) => {
+  const getInitials = (name: string) => {
     if (!name) return "U"; // "U" for unknown
     const parts = name.split(" ");
     return parts.length > 1

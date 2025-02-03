@@ -4,7 +4,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import CustomCursor from "@/components/CustomCursor"; // Import the CustomCursor component
-import {AuthProvider} from "@/lib/AuthProvider";  // Notice no curly braces
+import {AuthProvider} from "@/lib/authProvider";  // Notice no curly braces
 
 
 const inter = Inter({

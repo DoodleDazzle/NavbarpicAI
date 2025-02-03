@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import Navbar  from "@/components/navbar";
+import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Code2, Users } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useAuth } from "@/lib/authProvider";
+import { useRouter } from "next/navigation"; // Correct import
 
 // Define a simple fade-in variant for animations
 const fadeInUp = {
@@ -18,9 +20,21 @@ const fadeInUp = {
 };
 
 export default function Home() {
+  const { user, loading } = useAuth(); // Ensure we check loading state
+  const router = useRouter();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const handleStartCoding = () => {
+    if (loading) return; // Prevent redirect while loading user state
+    if (user) {
+      router.push("/editor"); // Redirect to editor if user is logged in
+    } else {
+      router.push("/signup"); // Redirect to sign-up page if not logged in
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -44,11 +58,13 @@ export default function Home() {
         </div>
 
         <div className="flex flex-wrap justify-center gap-4">
-          <Link href="/signup" passHref>
-            <Button className="bg-[#FF073A] text-white hover:bg-[#D00630] h-11 rounded-full px-8 text-lg flex items-center">
-              <Code2 className="mr-2 h-5 w-5" /> Start Coding
-            </Button>
-          </Link>
+          <Button
+            className="bg-[#FF073A] text-white hover:bg-[#D00630] h-11 rounded-full px-8 text-lg flex items-center"
+            onClick={handleStartCoding}
+            disabled={loading} // Disable button while user state is loading
+          >
+            <Code2 className="mr-2 h-5 w-5" /> Start Coding
+          </Button>
           <Link href="/join" passHref>
             <Button size="lg" variant="outline" className="text-lg rounded-full">
               <Users className="mr-2 h-5 w-5" /> Join Session

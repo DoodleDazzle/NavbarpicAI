@@ -10,6 +10,13 @@ import { MenuBar } from "@/components/editor/menu-bar";
 import { StatusBar } from "@/components/editor/status-bar";
 import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export default function EditorPage() {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
@@ -18,11 +25,21 @@ export default function EditorPage() {
   });
   const [output, setOutput] = useState<string>("");
   const [isRunning, setIsRunning] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        router.push("/signin"); // Redirect if no session
+      }
+    };
+    checkAuth();
+  }, [router]);
 
   // Auto-save functionality
   useEffect(() => {
     const saveInterval = setInterval(() => {
-      // Save to local storage or your preferred storage method
       localStorage.setItem("editor-files", JSON.stringify(files));
     }, 30000); // Auto-save every 30 seconds
 
@@ -39,34 +56,30 @@ export default function EditorPage() {
 
   const handleRunCode = async () => {
     if (!selectedFile) return;
-    
+
     setIsRunning(true);
     setOutput("");
-    
+
     try {
-      // Create a safe evaluation environment
       const code = files[selectedFile];
       const result = await new Promise((resolve) => {
         const output: string[] = [];
         const consoleLog = console.log;
-        
-        // Override console.log
+
         console.log = (...args) => {
           output.push(args.join(" "));
         };
-        
+
         try {
-          // Evaluate the code
           eval(code);
           resolve(output.join("\n"));
         } catch (error: any) {
           resolve(`Error: ${error.message}`);
         } finally {
-          // Restore console.log
           console.log = consoleLog;
         }
       });
-      
+
       setOutput(result as string);
     } catch (error: any) {
       setOutput(`Error: ${error.message}`);
@@ -76,12 +89,10 @@ export default function EditorPage() {
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    // Ctrl/Cmd + S to save
     if ((e.ctrlKey || e.metaKey) && e.key === "s") {
       e.preventDefault();
       localStorage.setItem("editor-files", JSON.stringify(files));
     }
-    // Ctrl/Cmd + R to run
     if ((e.ctrlKey || e.metaKey) && e.key === "r") {
       e.preventDefault();
       handleRunCode();
@@ -96,9 +107,8 @@ export default function EditorPage() {
   return (
     <div className="h-screen flex flex-col bg-background">
       <MenuBar />
-      
+
       <ResizablePanelGroup direction="horizontal" className="flex-1">
-        {/* File Explorer */}
         <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
           <FileExplorer
             files={files}
@@ -121,7 +131,6 @@ export default function EditorPage() {
           />
         </ResizablePanel>
 
-        {/* Editor Area */}
         <ResizablePanel defaultSize={60}>
           <div className="h-full flex flex-col">
             <EditorTabs
@@ -167,7 +176,6 @@ export default function EditorPage() {
           </div>
         </ResizablePanel>
 
-        {/* Terminal/Output */}
         <ResizablePanel defaultSize={20} minSize={15}>
           <Terminal output={output} />
         </ResizablePanel>
